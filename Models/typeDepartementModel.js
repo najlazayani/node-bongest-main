@@ -7,7 +7,8 @@ const Schema1 = mongoose.Schema
 
 const schemaTypeDepartement=mongoose.Schema({
         libelle:{type:String,default: ""},
-        icon:{type:String,default: 0}
+       
+        imagePath:{type:String,default:""}
        
     },
     { timestamps: true }
@@ -26,7 +27,7 @@ const TypeDepartement = mongoose.model('TypeDepartement',schemaTypeDepartement)
 function validateTypeDepartement(TypeDepartement){
     let schema = Joi.object({
         libelle:Joi.string().allow('', null),
-        icon:Joi.string().allow('', null)
+        imagePath:Joi.string().allow('', null)
         
     })
     return schema.validate(TypeDepartement)
