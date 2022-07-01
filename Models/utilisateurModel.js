@@ -20,16 +20,7 @@ const schemaUtilisateur=mongoose.Schema({
     { timestamps: true }
 )
 
-schemaUtilisateur.plugin(mongoosePaginate);
-
-schemaUtilisateur.method("toJSON", function() {
-    const { __v, _id, ...object } = this.toObject();
-    object.id = _id;
-    return object;
-});
-
-const Utilisateur = mongoose.model('Utilisateur',schemaUtilisateur)
-
+ 
 function validateUtilisateur(Utilisateur){
 
     let schema = Joi.object({

@@ -15,7 +15,7 @@ const { routerTypeDepartement } = require("./Routes/typeDepartementRoute")
 
 
 
-const { routerUtilisateur } = require("./Routes/utilisateurRoute")
+//const { routerUtilisateur } = require("./Routes/utilisateurRoute")
 
 
 
@@ -53,11 +53,18 @@ app.use(express.json())
 
 
 
+app.use('/typeDepartements', routerTypeDepartement)
 
-
-app.use('/utilisateurs', routerUtilisateur)
+//app.use('/utilisateurs', routerUtilisateur)
 
 app.use('/transporteurs', routerTransporteur)
+//app.use('/images',express.static(path.join('images')))
+
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static('images'));
+
+app.use('/images', express.static(__dirname + '/images/'));
 
 app.listen(4000,() => {
     console.log("here is console for backend")

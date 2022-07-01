@@ -13,18 +13,34 @@ var ObjectId = require('mongodb').ObjectID;
 
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, 'uploads')
+        cb(null, 'images')
     },
     filename: function (req, file, cb) {
-        cb(null,  file.originalname + Date.now())
+        console.log(file);
+        
+        cb(null,  Date.now() + file.originalname);
     }
 })
 
 
 var upload = multer({ storage: storage })
 
+router.post('/', upload.single('file'), function(req, res, next) {
+    if(!req.file) {
+        return res.status(500).send({ message: 'Upload fail'});
+    } else {
+        req.body.imageUrl = 'http://192.168.0.7:4000/images/' + req.file.filename;
+        TypeDepartement.create(req.body, function (err, typeDepartement) {
+            if (err) {
+                console.log(err);
+                return next(err);
+            }
+            res.json(typeDepartement);
+        });
+    }
+});
 
-router.post('/upload',upload.array('myFiles'),async(req,res)=>{
+router.post('/images',upload.array('myFiles'),async(req,res)=>{
     const files = req.files
     let arr=[];
     files.forEach(element => {
@@ -52,6 +68,7 @@ router.post('/newTypeDepartement', async(req,res)=>{
 
 router.post('/modifierTypeDepartement/:id', async(req,res)=>{
 
+    console.log("modifier",req.body);
     const typeDepartement = await TypeDepartement.findById(req.params.id)
 
     if(!typeDepartement) return res.status(401).send({status:false})
@@ -59,8 +76,9 @@ router.post('/modifierTypeDepartement/:id', async(req,res)=>{
     const result = await TypeDepartement.findOneAndUpdate({_id:req.params.id}, req.body)
 
     const typedepartement2 = await TypeDepartement.findById(req.params.id)
-
-    return res.send({status:true,resultat:typeDepartement2})
+console.log("test modifier");
+    console.log(typedepartement2 );
+    return res.send({status:true,resultat:typedepartement2})
 })
 
 
