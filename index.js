@@ -9,7 +9,10 @@ const mongoose = require("mongoose")
 app.use(cors());
 
 const { routerTransporteur } = require("./Routes/transporteurRoute")
-const { routerTypeDepartement } = require("./Routes/typeDepartementRoute")
+const { routerTypeDepartement } = require("./Routes/typeDepartementRoute");
+const { routerTaxe } = require("./Routes/taxeRoute");
+const { routerTypeCompteur } = require("./Routes/typeCompteurRoute");
+
 
 
 
@@ -58,6 +61,10 @@ app.use('/typeDepartements', routerTypeDepartement)
 //app.use('/utilisateurs', routerUtilisateur)
 
 app.use('/transporteurs', routerTransporteur)
+
+app.use('/taxe', routerTaxe)
+app.use('/typeCompteurs', routerTypeCompteur)
+
 //app.use('/images',express.static(path.join('images')))
 
 

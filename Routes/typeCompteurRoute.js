@@ -1,4 +1,4 @@
-const {TypeDepartement, validateTypeDepartement} =require('../Models/typeDepartementModel')
+const {TypeCompteur, validateTypeCompteur} =require('../Models/typeCompteurModel')
 const express=require('express')
 const router=express.Router()
 const jwt = require('jsonwebtoken');
@@ -30,12 +30,12 @@ router.post('/', upload.single('file'), function(req, res, next) {
         return res.status(500).send({ message: 'Upload fail'});
     } else {
         req.body.imageUrl = 'http://192.168.0.7:4000/images/' + req.file.filename;
-        TypeDepartement.create(req.body, function (err, typeDepartement) {
+        TypeCompteur.create(req.body, function (err, typeCompteur) {
             if (err) {
                 console.log(err);
                 return next(err);
             }
-            res.json(typeDepartement);
+            res.json(typeCompteur);
         });
     }
 });
@@ -52,13 +52,13 @@ router.post('/images',upload.array('myFiles'),async(req,res)=>{
 
 
 
-router.post('/newTypeDepartement', async(req,res)=>{
+router.post('/newTypeCompteur', async(req,res)=>{
 
     var body = req.body 
 
-    const typeDepartement=new TypeDepartement(body);
+    const typeCompteur = new TypeCompteur(body);
 
-    const result=await typeDepartement.save()
+    const result=await typeCompteur.save()
 
     return res.send({status:true,resultat:result})
 })
@@ -66,33 +66,33 @@ router.post('/newTypeDepartement', async(req,res)=>{
 
 
 
-router.post('/modifierTypeDepartement/:id', async(req,res)=>{
+router.post('/modifierTypeCompteur/:id', async(req,res)=>{
 
-    console.log("modifier",req.body);
-    const typeDepartement = await TypeDepartement.findById(req.params.id)
+    //console.log("modifier",req.body);
+    const typeCompteur = await TypeCompteur.findById(req.params.id)
 
-    if(!typeDepartement) return res.status(401).send({status:false})
+    if(!typeCompteur) return res.status(401).send({status:false})
 
-    const result = await TypeDepartement.findOneAndUpdate({_id:req.params.id}, req.body)
+    const result = await TypeCompteur.findOneAndUpdate({_id:req.params.id}, req.body)
 
-    const typedepartement2 = await TypeDepartement.findById(req.params.id)
+    const typeCompteur2 = await TypeCompteur.findById(req.params.id)
 console.log("test modifier");
-    console.log(typedepartement2 );
-    return res.send({status:true,resultat:typedepartement2})
+    console.log(typeCompteur2 );
+    return res.send({status:true,resultat:typeCompteur2})
 })
 
 
 
-router.post('/deleteTypeDepartement/:id', async(req,res)=>{
+router.post('/deleteTypeCompteur/:id', async(req,res)=>{
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
-    const typeDepartement = await TypeDepartement.findById(req.params.id)
+    const typeCompteur = await TypeCompteur.findById(req.params.id)
 
-    if(!typeDepartement) return res.status(401).send({status:false})
+    if(!typeCompteur) return res.status(401).send({status:false})
 
 
-    if(await TypeDepartement.findOneAndDelete({_id:req.params.id})){
+    if(await TypeCompteur.findOneAndDelete({_id:req.params.id})){
         return res.send({status:true})
     }else{
         return res.send({status:false})
@@ -117,7 +117,7 @@ const myCustomLabels = {
 
 
 
- router.post('/listTypeDepartements', async(req,res)=>{
+ router.post('/listTypeCompteurs', async(req,res)=>{
   
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
   
@@ -165,11 +165,11 @@ const myCustomLabels = {
     var result = []
     
     if(listFilter.length > 1){
-      result = await  TypeDepartement.paginate({$and:listFilter}, options) 
+      result = await  TypeCompteur.paginate({$and:listFilter}, options) 
     }else if(listFilter.length == 1){
-      result = await  TypeDepartement.paginate(listFilter[0], options)
+      result = await  TypeCompteur.paginate(listFilter[0], options)
     }else{
-      result = await  TypeDepartement.paginate({}, options)
+      result = await  TypeCompteur.paginate({}, options)
     }
 
     return res.send({status:true, resultat:result, request:req.body})
@@ -182,17 +182,17 @@ router.get('/getById/:id', async(req,res)=>{
 
     if(req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({status:false})
 
-    const typeDepartement = await TypeDepartement.findOne({_id:req.params.id})
+    const typeCompteur = await TypeCompteur.findOne({_id:req.params.id})
 
-    return res.send({status:true,resultat:typeDepartement})
+    return res.send({status:true,resultat:typeCompteur})
 
 })
 
-router.get('/getAllParametres', async(req,res)=>{
+router.post('/getAllParametres', verifytoken, async(req,res)=>{
     
-    const typeDepartements = await TypeDepartement.find({})
+    const typeCompteurs = await TypeCompteur.find({})
     
-    return res.send({status:true, typeDepartements:typeDepartements}) 
+    return res.send({status:true, typeCompteurs:typeCompteurs}) 
 })
 
 function verifytoken(req, res, next){
@@ -218,4 +218,4 @@ function verifytoken(req, res, next){
 
 }
 
-module.exports.routerTypeDepartement=router
+module.exports.routerTypeCompteur=router
