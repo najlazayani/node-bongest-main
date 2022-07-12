@@ -21,7 +21,7 @@ const { routerReclamation } = require("./Routes/etat-reclamationRoute");
 
 
 
-
+const { routerTypeEquipement } = require("./Routes/type-equipementRoute");
 
 
 
@@ -53,8 +53,7 @@ app.use(express.json())
 //app.use(allowCrossDomain);
 
 
-
-
+app.use('/typeequipement', routerTypeEquipement)
 app.use('/familles', routerFamille)
 app.use('/utilisateurs', routerUtilisateur)
 app.use('/reclamations', routerReclamation)
@@ -62,7 +61,7 @@ app.use('/reclamations', routerReclamation)
 app.use('/transporteurs', routerTransporteur)
 app.use('/parametres', routerParametre)
 
-app.listen(4000, () => {
+app.listen(5000, () => {
     console.log("here is console for backend")
 })
 

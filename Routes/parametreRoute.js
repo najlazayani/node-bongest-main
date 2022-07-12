@@ -172,7 +172,7 @@ router.get('/getById/:id', async(req, res) => {
 
 })
 
-router.post('/getAllParametres', verifytoken, async(req, res) => {
+router.get('/getAllParametres', async(req, res) => {
 
     const parametres = await Parametre.find({})
 

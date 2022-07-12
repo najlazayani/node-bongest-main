@@ -172,11 +172,11 @@ router.get('/getById/:id', async(req, res) => {
 
 })
 
-router.post('/getAllParametres', verifytoken, async(req, res) => {
+router.get('/getAllParametres', async(req, res) => {
 
-    const reclamatios = await Reclamation.find({})
+    const reclamations = await Reclamation.find({})
 
-    return res.send({ status: true, reclamations: reclamatios })
+    return res.send({ status: true, reclamations: reclamations })
 })
 
 function verifytoken(req, res, next) {
