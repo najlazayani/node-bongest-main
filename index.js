@@ -9,15 +9,12 @@ const mongoose = require("mongoose")
 app.use(cors());
 
 const { routerTransporteur } = require("./Routes/transporteurRoute")
-<<<<<<< HEAD
 const { routerTypeDepartement } = require("./Routes/typeDepartementRoute");
 const { routerTaxe } = require("./Routes/taxeRoute");
 const { routerTypeCompteur } = require("./Routes/typeCompteurRoute");
 const { routerFamilleProduit } = require("./Routes/familleProduitRoute");
 
 const { routerTypePlat } = require ("./Routes/typePlatRoute");
-=======
->>>>>>> 5ff69096ea53d4764312f28425e06ae1e264b6ca
 
 const { routerFamille } = require("./Routes/famillesRoute")
 
