@@ -12,9 +12,9 @@ const { routerTransporteur } = require("./Routes/transporteurRoute")
 const { routerTypeDepartement } = require("./Routes/typeDepartementRoute");
 const { routerTaxe } = require("./Routes/taxeRoute");
 const { routerTypeCompteur } = require("./Routes/typeCompteurRoute");
+const { routerFamilleProduit } = require("./Routes/familleProduitRoute");
 
-
-
+const { routerTypePlat } = require ("./Routes/typePlatRoute");
 
 
 
@@ -64,7 +64,8 @@ app.use('/transporteurs', routerTransporteur)
 
 app.use('/taxe', routerTaxe)
 app.use('/typeCompteurs', routerTypeCompteur)
-
+app.use('/FamilleProduits', routerFamilleProduit)
+app.use('/TypePlats', routerTypePlat)
 //app.use('/images',express.static(path.join('images')))
 
 

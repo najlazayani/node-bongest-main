@@ -1,4 +1,4 @@
-const {TypeCompteur, validateTypeCompteur} =require('../Models/typeCompteurModel')
+const {TypePlat, validateTypePlat} =require('../Models/typePlatModel')
 const express=require('express')
 const router=express.Router()
 const jwt = require('jsonwebtoken');
@@ -11,54 +11,15 @@ var dateFormat = require('dateformat');
 var ObjectId = require('mongodb').ObjectID;
 
 
-var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'images')
-    },
-    filename: function (req, file, cb) {
-        console.log(file);
-        
-        cb(null,  Date.now() + file.originalname);
-    }
-})
 
-
-var upload = multer({ storage: storage })
-
-router.post('/', upload.single('file'), function(req, res, next) {
-    if(!req.file) {
-        return res.status(500).send({ message: 'Upload fail'});
-    } else {
-        req.body.imageUrl = 'http://192.168.0.7:4000/images/' + req.file.filename;
-        TypeCompteur.create(req.body, function (err, typeCompteur) {
-            if (err) {
-                console.log(err);
-                return next(err);
-            }
-            res.json(typeCompteur);
-        });
-    }
-});
-
-router.post('/images',upload.array('myFiles'),async(req,res)=>{
-    const files = req.files
-    let arr=[];
-    files.forEach(element => {
-        arr.push(element.path)
-    })
-    return res.send(arr)
-})
-
-
-
-
-router.post('/newTypeCompteur', async(req,res)=>{
+router.post('/newTypePlat', async(req,res)=>{
 
     var body = req.body 
 
-    const typeCompteur = new TypeCompteur(body);
+    
+    const typePlat=new TypePlat(body);
 
-    const result=await typeCompteur.save()
+    const result=await typePlat.save()
 
     return res.send({status:true,resultat:result})
 })
@@ -66,33 +27,41 @@ router.post('/newTypeCompteur', async(req,res)=>{
 
 
 
-router.post('/modifierTypeCompteur/:id', async(req,res)=>{
-
-    //console.log("modifier",req.body);
-    const typeCompteur = await TypeCompteur.findById(req.params.id)
-
-    if(!typeCompteur) return res.status(401).send({status:false})
-
-    const result = await TypeCompteur.findOneAndUpdate({_id:req.params.id}, req.body)
-
-    const typeCompteur2 = await TypeCompteur.findById(req.params.id)
-console.log("test modifier");
-    console.log(typeCompteur2 );
-    return res.send({status:true,resultat:typeCompteur2})
-})
 
 
 
-router.post('/deleteTypeCompteur/:id', async(req,res)=>{
+
+
+router.post('/modifierTypePlat/:id', async(req,res)=>{
+
+    console.log(req.body);
+
+    const typePlat = await TypePlat.findById(req.params.id)
+    
+
+    if(!typePlat) {
+        return 
+         res.status(401).send({status:false})}
+        
+    const result = await TypePlat.findOneAndUpdate({_id:req.params.id}, req.body)
+
+     const typePlat2 = await TypePlat.findById(req.params.id);
+     console.log(typePlat2);
+
+     return res.send({status:true,resultat:typePlat2})})
+
+
+
+router.post('/deleteTypePlat/:id', async(req,res)=>{
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
-    const typeCompteur = await TypeCompteur.findById(req.params.id)
+    const typePlat = await TypePlat.findById(req.params.id)
 
-    if(!typeCompteur) return res.status(401).send({status:false})
+    if(!typePlat) return res.status(401).send({status:false})
 
 
-    if(await TypeCompteur.findOneAndDelete({_id:req.params.id})){
+    if(await TypePlat.findOneAndDelete({_id:req.params.id})){
         return res.send({status:true})
     }else{
         return res.send({status:false})
@@ -117,7 +86,7 @@ const myCustomLabels = {
 
 
 
- router.post('/listTypeCompteurs', async(req,res)=>{
+ router.post('/listTypePlat', async(req,res)=>{
   
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
   
@@ -165,11 +134,11 @@ const myCustomLabels = {
     var result = []
     
     if(listFilter.length > 1){
-      result = await  TypeCompteur.paginate({$and:listFilter}, options) 
+      result = await  TypePlat.paginate({$and:listFilter}, options) 
     }else if(listFilter.length == 1){
-      result = await  TypeCompteur.paginate(listFilter[0], options)
+      result = await  TypePlat.paginate(listFilter[0], options)
     }else{
-      result = await  TypeCompteur.paginate({}, options)
+      result = await  TypePlat.paginate({}, options)
     }
 
     return res.send({status:true, resultat:result, request:req.body})
@@ -182,17 +151,17 @@ router.get('/getById/:id', async(req,res)=>{
 
     if(req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({status:false})
 
-    const typeCompteur = await TypeCompteur.findOne({_id:req.params.id})
+    const typePlat = await TypePlat.findOne({_id:req.params.id})
 
-    return res.send({status:true,resultat:typeCompteur})
+    return res.send({status:true,resultat:typePlat})
 
 })
 
-router.get('/getAllParametres', async(req,res)=>{
+router.get('/getAllParametres',  async(req,res)=>{
     
-    const typeCompteurs = await TypeCompteur.find({})
+    const typePlats = await TypePlat.find({})
     
-    return res.send({status:true, typeCompteurs:typeCompteurs}) 
+    return res.send({status:true, typePlats:typePlats}) 
 })
 
 function verifytoken(req, res, next){
@@ -218,4 +187,4 @@ function verifytoken(req, res, next){
 
 }
 
-module.exports.routerTypeCompteur=router
+module.exports.routerTypePlat=router
