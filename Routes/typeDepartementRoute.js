@@ -1,6 +1,6 @@
-const {TypeDepartement, validateTypeDepartement} =require('../Models/typeDepartementModel')
-const express=require('express')
-const router=express.Router()
+const { TypeDepartement, validateTypeDepartement } = require('../Models/typeDepartementModel')
+const express = require('express')
+const router = express.Router()
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 var multer = require('multer');
@@ -12,21 +12,37 @@ var ObjectId = require('mongodb').ObjectID;
 
 
 var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-        cb(null, 'uploads')
+    destination: function(req, file, cb) {
+        cb(null, 'images')
     },
-    filename: function (req, file, cb) {
-        cb(null,  file.originalname + Date.now())
+    filename: function(req, file, cb) {
+        console.log(file);
+
+        cb(null, Date.now() + file.originalname);
     }
 })
 
 
 var upload = multer({ storage: storage })
 
+router.post('/', upload.single('file'), function(req, res, next) {
+    if (!req.file) {
+        return res.status(500).send({ message: 'Upload fail' });
+    } else {
+        req.body.imageUrl = 'http://192.168.0.7:4000/images/' + req.file.filename;
+        TypeDepartement.create(req.body, function(err, typeDepartement) {
+            if (err) {
+                console.log(err);
+                return next(err);
+            }
+            res.json(typeDepartement);
+        });
+    }
+});
 
-router.post('/upload',upload.array('myFiles'),async(req,res)=>{
+router.post('/images', upload.array('myFiles'), async(req, res) => {
     const files = req.files
-    let arr=[];
+    let arr = [];
     files.forEach(element => {
         arr.push(element.path)
     })
@@ -36,48 +52,50 @@ router.post('/upload',upload.array('myFiles'),async(req,res)=>{
 
 
 
-router.post('/newTypeDepartement', async(req,res)=>{
+router.post('/newTypeDepartement', async(req, res) => {
 
-    var body = req.body 
+    var body = req.body
 
-    const typeDepartement=new TypeDepartement(body);
+    const typeDepartement = new TypeDepartement(body);
 
-    const result=await typeDepartement.save()
+    const result = await typeDepartement.save()
 
-    return res.send({status:true,resultat:result})
+    return res.send({ status: true, resultat: result })
 })
 
 
 
 
-router.post('/modifierTypeDepartement/:id', async(req,res)=>{
+router.post('/modifierTypeDepartement/:id', async(req, res) => {
 
+    console.log("modifier", req.body);
     const typeDepartement = await TypeDepartement.findById(req.params.id)
 
-    if(!typeDepartement) return res.status(401).send({status:false})
+    if (!typeDepartement) return res.status(401).send({ status: false })
 
-    const result = await TypeDepartement.findOneAndUpdate({_id:req.params.id}, req.body)
+    const result = await TypeDepartement.findOneAndUpdate({ _id: req.params.id }, req.body)
 
     const typedepartement2 = await TypeDepartement.findById(req.params.id)
-
-    return res.send({status:true,resultat:typeDepartement2})
+    console.log("test modifier");
+    console.log(typedepartement2);
+    return res.send({ status: true, resultat: typedepartement2 })
 })
 
 
 
-router.post('/deleteTypeDepartement/:id', async(req,res)=>{
+router.post('/deleteTypeDepartement/:id', async(req, res) => {
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
     const typeDepartement = await TypeDepartement.findById(req.params.id)
 
-    if(!typeDepartement) return res.status(401).send({status:false})
+    if (!typeDepartement) return res.status(401).send({ status: false })
 
 
-    if(await TypeDepartement.findOneAndDelete({_id:req.params.id})){
-        return res.send({status:true})
-    }else{
-        return res.send({status:false})
+    if (await TypeDepartement.findOneAndDelete({ _id: req.params.id })) {
+        return res.send({ status: true })
+    } else {
+        return res.send({ status: false })
     }
 
 })
@@ -99,41 +117,41 @@ const myCustomLabels = {
 
 
 
- router.post('/listTypeDepartements', async(req,res)=>{
-  
+router.post('/listTypeDepartements', async(req, res) => {
+
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
-  
+
     var sort = {}
-    for( let key in req.body.orderBy){
-        if(Number(req.body.orderBy[key]) != 0){
-             sort[key] = req.body.orderBy[key]
-        }  
+    for (let key in req.body.orderBy) {
+        if (Number(req.body.orderBy[key]) != 0) {
+            sort[key] = req.body.orderBy[key]
+        }
     }
 
-    if(Object.keys(sort).length == 0){
-        sort = {createdAt:-1}
+    if (Object.keys(sort).length == 0) {
+        sort = { createdAt: -1 }
     }
-   
-    var listFilter =[]
-    
+
+    var listFilter = []
+
     var search = req.body.search
-    
-    for( let key in search){
-        if(search[key] != ""){
+
+    for (let key in search) {
+        if (search[key] != "") {
             var word1 = search[key].charAt(0).toUpperCase() + search[key].slice(1)
             var word2 = search[key].toUpperCase()
             var word3 = search[key].toLowerCase()
             var objet1 = {}
             objet1[key] = { $regex: '.*' + word1 + '.*' }
-           
+
             var objet2 = {}
             objet2[key] = { $regex: '.*' + word2 + '.*' }
-            
+
             var objet3 = {}
             objet3[key] = { $regex: '.*' + word3 + '.*' }
 
-            listFilter.push({$or:[objet1, objet2, objet3]})
-        }  
+            listFilter.push({ $or: [objet1, objet2, objet3] })
+        }
     }
 
     const options = {
@@ -141,63 +159,63 @@ const myCustomLabels = {
         limit: Number(req.body.limit),
         customLabels: myCustomLabels,
         //populate: 'client'
-        sort:sort
+        sort: sort
     };
 
     var result = []
-    
-    if(listFilter.length > 1){
-      result = await  TypeDepartement.paginate({$and:listFilter}, options) 
-    }else if(listFilter.length == 1){
-      result = await  TypeDepartement.paginate(listFilter[0], options)
-    }else{
-      result = await  TypeDepartement.paginate({}, options)
+
+    if (listFilter.length > 1) {
+        result = await TypeDepartement.paginate({ $and: listFilter }, options)
+    } else if (listFilter.length == 1) {
+        result = await TypeDepartement.paginate(listFilter[0], options)
+    } else {
+        result = await TypeDepartement.paginate({}, options)
     }
 
-    return res.send({status:true, resultat:result, request:req.body})
-    
-})
-
-
-
-router.get('/getById/:id', async(req,res)=>{
-
-    if(req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({status:false})
-
-    const typeDepartement = await TypeDepartement.findOne({_id:req.params.id})
-
-    return res.send({status:true,resultat:typeDepartement})
+    return res.send({ status: true, resultat: result, request: req.body })
 
 })
 
-router.post('/getAllParametres', verifytoken, async(req,res)=>{
-    
+
+
+router.get('/getById/:id', async(req, res) => {
+
+    if (req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({ status: false })
+
+    const typeDepartement = await TypeDepartement.findOne({ _id: req.params.id })
+
+    return res.send({ status: true, resultat: typeDepartement })
+
+})
+
+router.post('/getAllParametres', verifytoken, async(req, res) => {
+
     const typeDepartements = await TypeDepartement.find({})
-    
-    return res.send({status:true, typeDepartements:typeDepartements}) 
+
+    return res.send({ status: true, typeDepartements: typeDepartements })
 })
 
-function verifytoken(req, res, next){
+function verifytoken(req, res, next) {
     const bearerHeader = req.headers['authorization'];
 
-    if(typeof bearerHeader !== 'undefined'){
+    if (typeof bearerHeader !== 'undefined') {
 
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
         jwt.verify(bearerToken, 'secretkey', (err, authData) => {
-            if(err){
+            if (err) {
                 res.sendStatus(403);
-            }else{
+            } else {
                 req.user = authData;
                 next();
             }
         });
 
-    }else{
+    } else {
         console.log("etape100");
         res.sendStatus(401);
     }
 
 }
 
-module.exports.routerTypeDepartement=router
+module.exports.routerTypeDepartement = router

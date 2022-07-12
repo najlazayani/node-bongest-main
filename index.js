@@ -17,8 +17,7 @@ const { routerFamille } = require("./Routes/famillesRoute")
 const { routerUtilisateur } = require("./Routes/utilisateurRoute");
 const { routerParametre } = require("./Routes/parametreRoute");
 const { routerReclamation } = require("./Routes/etat-reclamationRoute");
-
-
+const { routerTypeDepartement } = require("./Routes/typeDepartementRoute")
 
 
 const { routerTypeEquipement } = require("./Routes/type-equipementRoute");
@@ -60,18 +59,27 @@ app.use('/reclamations', routerReclamation)
 
 app.use('/transporteurs', routerTransporteur)
 app.use('/parametres', routerParametre)
+app.use('/typeDepartements', routerTypeDepartement)
 
-app.listen(5000, () => {
-    console.log("here is console for backend")
-})
+//app.use('/images',express.static(path.join('images')))
+
+
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.static('images'));
+
+app.use('/images', express.static(__dirname + '/images/'));
+
+// app.listen(4000,() => {
+//     console.log("here is console for backend")
+// })
 
 
 
 
 /*app.all('*', function (req, res) {
 	res.sendFile(__dirname + "/public/index.html");
-});
+});*/
 
 app.listen(process.env.PORT || 5000, () => {
-	console.log("server conected to port 5000")
-})*/
+    console.log("server conected to port 5000")
+})
