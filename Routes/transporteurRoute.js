@@ -1,6 +1,6 @@
-const {Transporteur, validateTransporteur} =require('../Models/transporteursModel')
-const express=require('express')
-const router=express.Router()
+const { Transporteur, validateTransporteur } = require('../Models/transporteursModel')
+const express = require('express')
+const router = express.Router()
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 var multer = require('multer');
@@ -12,11 +12,11 @@ var ObjectId = require('mongodb').ObjectID;
 
 
 var storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: function(req, file, cb) {
         cb(null, 'uploads')
     },
-    filename: function (req, file, cb) {
-        cb(null,  file.originalname + Date.now())
+    filename: function(req, file, cb) {
+        cb(null, file.originalname + Date.now())
     }
 })
 
@@ -86,9 +86,9 @@ var upload = multer({ storage: storage })
  *         500:
  *           description: Some server error
  */
-router.post('/upload',upload.array('myFiles'),async(req,res)=>{
+router.post('/upload', upload.array('myFiles'), async(req, res) => {
     const files = req.files
-    let arr=[];
+    let arr = [];
     files.forEach(element => {
         arr.push(element.path)
     })
@@ -147,16 +147,16 @@ router.post('/upload',upload.array('myFiles'),async(req,res)=>{
  *
  */
 
-router.post('/newTransporteur', async(req,res)=>{
+router.post('/newTransporteur', async(req, res) => {
 
-    var body = req.body 
+    var body = req.body
 
-    
-    const transporteur=new Transporteur(body);
 
-    const result=await transporteur.save()
+    const transporteur = new Transporteur(body);
 
-    return res.send({status:true,resultat:result})
+    const result = await transporteur.save()
+
+    return res.send({ status: true, resultat: result })
 })
 
 
@@ -226,7 +226,7 @@ router.post('/newTransporteur', async(req,res)=>{
 
 
 
-router.post('/modifierTransporteur/:id', async(req,res)=>{
+router.post('/modifierTransporteur/:id', async(req, res) => {
 
     console.log("najla is in the backend");
     console.log(req.body);
@@ -236,16 +236,18 @@ router.post('/modifierTransporteur/:id', async(req,res)=>{
     console.log("transporteur");
     console.log(transporteur);
 
-    if(!transporteur) {
-        return 
-         res.status(401).send({status:false})}
-        
-    const result = await Transporteur.findOneAndUpdate({_id:req.params.id}, req.body)
+    if (!transporteur) {
+        return
+        res.status(401).send({ status: false })
+    }
 
-     const transporteur2 = await Transporteur.findById(req.params.id);
-     console.log(transporteur2);
+    const result = await Transporteur.findOneAndUpdate({ _id: req.params.id }, req.body)
 
-     return res.send({status:true,resultat:transporteur2})})
+    const transporteur2 = await Transporteur.findById(req.params.id);
+    console.log(transporteur2);
+
+    return res.send({ status: true, resultat: transporteur2 })
+})
 
 /**
  * @swagger
@@ -277,19 +279,19 @@ router.post('/modifierTransporteur/:id', async(req,res)=>{
  *         description: Some error happened
  */
 
-router.post('/deleteTransporteur/:id', async(req,res)=>{
+router.post('/deleteTransporteur/:id', async(req, res) => {
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
     const transporteur = await Transporteur.findById(req.params.id)
 
-    if(!transporteur) return res.status(401).send({status:false})
+    if (!transporteur) return res.status(401).send({ status: false })
 
 
-    if(await Transporteur.findOneAndDelete({_id:req.params.id})){
-        return res.send({status:true})
-    }else{
-        return res.send({status:false})
+    if (await Transporteur.findOneAndDelete({ _id: req.params.id })) {
+        return res.send({ status: true })
+    } else {
+        return res.send({ status: false })
     }
 
 })
@@ -390,41 +392,41 @@ const myCustomLabels = {
  *
  */
 
- router.post('/listTransporteurs', async(req,res)=>{
-  
+router.post('/listTransporteurs', async(req, res) => {
+
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
-  
+
     var sort = {}
-    for( let key in req.body.orderBy){
-        if(Number(req.body.orderBy[key]) != 0){
-             sort[key] = req.body.orderBy[key]
-        }  
+    for (let key in req.body.orderBy) {
+        if (Number(req.body.orderBy[key]) != 0) {
+            sort[key] = req.body.orderBy[key]
+        }
     }
 
-    if(Object.keys(sort).length == 0){
-        sort = {createdAt:-1}
+    if (Object.keys(sort).length == 0) {
+        sort = { createdAt: -1 }
     }
-   
-    var listFilter =[]
-    
+
+    var listFilter = []
+
     var search = req.body.search
-    
-    for( let key in search){
-        if(search[key] != ""){
+
+    for (let key in search) {
+        if (search[key] != "") {
             var word1 = search[key].charAt(0).toUpperCase() + search[key].slice(1)
             var word2 = search[key].toUpperCase()
             var word3 = search[key].toLowerCase()
             var objet1 = {}
             objet1[key] = { $regex: '.*' + word1 + '.*' }
-           
+
             var objet2 = {}
             objet2[key] = { $regex: '.*' + word2 + '.*' }
-            
+
             var objet3 = {}
             objet3[key] = { $regex: '.*' + word3 + '.*' }
 
-            listFilter.push({$or:[objet1, objet2, objet3]})
-        }  
+            listFilter.push({ $or: [objet1, objet2, objet3] })
+        }
     }
 
     const options = {
@@ -432,21 +434,21 @@ const myCustomLabels = {
         limit: Number(req.body.limit),
         customLabels: myCustomLabels,
         //populate: 'client'
-        sort:sort
+        sort: sort
     };
 
     var result = []
-    
-    if(listFilter.length > 1){
-      result = await  Transporteur.paginate({$and:listFilter}, options) 
-    }else if(listFilter.length == 1){
-      result = await  Transporteur.paginate(listFilter[0], options)
-    }else{
-      result = await  Transporteur.paginate({}, options)
+
+    if (listFilter.length > 1) {
+        result = await Transporteur.paginate({ $and: listFilter }, options)
+    } else if (listFilter.length == 1) {
+        result = await Transporteur.paginate(listFilter[0], options)
+    } else {
+        result = await Transporteur.paginate({}, options)
     }
 
-    return res.send({status:true, resultat:result, request:req.body})
-    
+    return res.send({ status: true, resultat: result, request: req.body })
+
 })
 
 
@@ -498,44 +500,44 @@ const myCustomLabels = {
  *       500:
  *         description: Some error happened
  */
-router.get('/getById/:id', async(req,res)=>{
+router.get('/getById/:id', async(req, res) => {
 
-    if(req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({status:false})
+    if (req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({ status: false })
 
-    const transporteur = await Transporteur.findOne({_id:req.params.id})
+    const transporteur = await Transporteur.findOne({ _id: req.params.id })
 
-    return res.send({status:true,resultat:transporteur})
+    return res.send({ status: true, resultat: transporteur })
 
 })
 
-router.post('/getAllParametres', verifytoken, async(req,res)=>{
-    
+router.post('/getAllParametres', verifytoken, async(req, res) => {
+
     const transporteurs = await Transporteur.find({})
-    
-    return res.send({status:true, transporteurs:transporteurs}) 
+
+    return res.send({ status: true, transporteurs: transporteurs })
 })
 
-function verifytoken(req, res, next){
+function verifytoken(req, res, next) {
     const bearerHeader = req.headers['authorization'];
 
-    if(typeof bearerHeader !== 'undefined'){
+    if (typeof bearerHeader !== 'undefined') {
 
         const bearer = bearerHeader.split(' ');
         const bearerToken = bearer[1];
         jwt.verify(bearerToken, 'secretkey', (err, authData) => {
-            if(err){
+            if (err) {
                 res.sendStatus(403);
-            }else{
+            } else {
                 req.user = authData;
                 next();
             }
         });
 
-    }else{
+    } else {
         console.log("etape100");
         res.sendStatus(401);
     }
 
 }
 
-module.exports.routerTransporteur=router
+module.exports.routerTransporteur = router

@@ -1,18 +1,16 @@
-const mongoose=require('mongoose')
-const Joi=require('joi')
+const mongoose = require('mongoose')
+const Joi = require('joi')
 const mongoosePaginate = require('mongoose-paginate');
 
 const Schema = mongoose.Schema
 const Schema1 = mongoose.Schema
 
-const schemaTypeDepartement=mongoose.Schema({
-        libelle:{type:String,default: ""},
-       
-        imagePath:{type:String,default:""}
-       
-    },
-    { timestamps: true }
-)
+const schemaTypeDepartement = mongoose.Schema({
+    libelle: { type: String, default: "" },
+
+    imagePath: { type: String, default: "" }
+
+}, { timestamps: true })
 
 schemaTypeDepartement.plugin(mongoosePaginate);
 
@@ -22,18 +20,15 @@ schemaTypeDepartement.method("toJSON", function() {
     return object;
 });
 
-const TypeDepartement = mongoose.model('TypeDepartement',schemaTypeDepartement)
+const TypeDepartement = mongoose.model('TypeDepartement', schemaTypeDepartement)
 
-function validateTypeDepartement(TypeDepartement){
+function validateTypeDepartement(TypeDepartement) {
     let schema = Joi.object({
-        libelle:Joi.string().allow('', null),
-        imagePath:Joi.string().allow('', null)
-        
+        libelle: Joi.string().allow('', null),
+        imagePath: Joi.string().allow('', null)
+
     })
     return schema.validate(TypeDepartement)
 }
-module.exports.TypeDepartement=TypeDepartement
-module.exports.validateTypeDepartement=validateTypeDepartement
-
-
-
+module.exports.TypeDepartement = TypeDepartement
+module.exports.validateTypeDepartement = validateTypeDepartement

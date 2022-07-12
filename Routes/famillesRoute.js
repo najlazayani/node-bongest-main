@@ -1,4 +1,4 @@
-const { TypeDepartement, validateTypeDepartement } = require('../Models/typeDepartementModel')
+const { Famille, validateFamille } = require('../Models/familleModel')
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken');
@@ -13,34 +13,18 @@ var ObjectId = require('mongodb').ObjectID;
 
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, 'images')
+        cb(null, 'uploads')
     },
     filename: function(req, file, cb) {
-        console.log(file);
-
-        cb(null, Date.now() + file.originalname);
+        cb(null, file.originalname + Date.now())
     }
 })
 
 
 var upload = multer({ storage: storage })
 
-router.post('/', upload.single('file'), function(req, res, next) {
-    if (!req.file) {
-        return res.status(500).send({ message: 'Upload fail' });
-    } else {
-        req.body.imageUrl = 'http://192.168.0.7:4000/images/' + req.file.filename;
-        TypeDepartement.create(req.body, function(err, typeDepartement) {
-            if (err) {
-                console.log(err);
-                return next(err);
-            }
-            res.json(typeDepartement);
-        });
-    }
-});
 
-router.post('/images', upload.array('myFiles'), async(req, res) => {
+router.post('/upload', upload.array('myFiles'), async(req, res) => {
     const files = req.files
     let arr = [];
     files.forEach(element => {
@@ -49,16 +33,14 @@ router.post('/images', upload.array('myFiles'), async(req, res) => {
     return res.send(arr)
 })
 
-
-
-
-router.post('/newTypeDepartement', async(req, res) => {
+router.post('/newFamille', async(req, res) => {
 
     var body = req.body
 
-    const typeDepartement = new TypeDepartement(body);
 
-    const result = await typeDepartement.save()
+    const famille = new Famille(body);
+
+    const result = await famille.save()
 
     return res.send({ status: true, resultat: result })
 })
@@ -66,33 +48,37 @@ router.post('/newTypeDepartement', async(req, res) => {
 
 
 
-router.post('/modifierTypeDepartement/:id', async(req, res) => {
+router.post('/modifierFamille/:id', async(req, res) => {
 
-    console.log("modifier", req.body);
-    const typeDepartement = await TypeDepartement.findById(req.params.id)
+    console.log(req.body);
 
-    if (!typeDepartement) return res.status(401).send({ status: false })
+    const famille = await Famille.findById(req.params.id)
+    console.log(req.params.id);
+    console.log("famille");
+    console.log(famille);
 
-    const result = await TypeDepartement.findOneAndUpdate({ _id: req.params.id }, req.body)
+    if (!famille) {
+        return
+        res.status(401).send({ status: false })
+    }
 
-    const typedepartement2 = await TypeDepartement.findById(req.params.id)
-    console.log("test modifier");
-    console.log(typedepartement2);
-    return res.send({ status: true, resultat: typedepartement2 })
+    const result = await Famille.findOneAndUpdate({ _id: req.params.id }, req.body)
+
+    const famille2 = await Famille.findById(req.params.id);
+    console.log(famille2);
+
+    return res.send({ status: true, resultat: famille2 })
 })
 
+router.post('/deleteFamille/:id', async(req, res) => {
 
 
-router.post('/deleteTypeDepartement/:id', async(req, res) => {
+    const famille = await Famille.findById(req.params.id)
 
-    //if(req.user.user.role != "admin") return res.status(401).send({status:false})
-
-    const typeDepartement = await TypeDepartement.findById(req.params.id)
-
-    if (!typeDepartement) return res.status(401).send({ status: false })
+    if (!famille) return res.status(401).send({ status: false })
 
 
-    if (await TypeDepartement.findOneAndDelete({ _id: req.params.id })) {
+    if (await famille.findOneAndDelete({ _id: req.params.id })) {
         return res.send({ status: true })
     } else {
         return res.send({ status: false })
@@ -116,8 +102,7 @@ const myCustomLabels = {
 
 
 
-
-router.post('/listTypeDepartements', async(req, res) => {
+router.post('/listFamille', async(req, res) => {
 
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
 
@@ -165,11 +150,11 @@ router.post('/listTypeDepartements', async(req, res) => {
     var result = []
 
     if (listFilter.length > 1) {
-        result = await TypeDepartement.paginate({ $and: listFilter }, options)
+        result = await Famille.paginate({ $and: listFilter }, options)
     } else if (listFilter.length == 1) {
-        result = await TypeDepartement.paginate(listFilter[0], options)
+        result = await Famille.paginate(listFilter[0], options)
     } else {
-        result = await TypeDepartement.paginate({}, options)
+        result = await Famille.paginate({}, options)
     }
 
     return res.send({ status: true, resultat: result, request: req.body })
@@ -177,22 +162,21 @@ router.post('/listTypeDepartements', async(req, res) => {
 })
 
 
-
 router.get('/getById/:id', async(req, res) => {
 
     if (req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({ status: false })
 
-    const typeDepartement = await TypeDepartement.findOne({ _id: req.params.id })
+    const famille = await Famille.findOne({ _id: req.params.id })
 
-    return res.send({ status: true, resultat: typeDepartement })
+    return res.send({ status: true, resultat: famille })
 
 })
 
-router.get('/getAllParametres', async(req,res)=>{
-    
-    const typeDepartements = await TypeDepartement.find({})
+router.get('/getAllParametres', async(req, res) => {
 
-    return res.send({ status: true, typeDepartements: typeDepartements })
+    const familles = await Famille.find({})
+
+    return res.send({ status: true, familles: familles })
 })
 
 function verifytoken(req, res, next) {
@@ -218,4 +202,4 @@ function verifytoken(req, res, next) {
 
 }
 
-module.exports.routerTypeDepartement = router
+module.exports.routerFamille = router
