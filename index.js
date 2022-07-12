@@ -9,18 +9,18 @@ const mongoose = require("mongoose")
 app.use(cors());
 
 const { routerTransporteur } = require("./Routes/transporteurRoute")
+
+const { routerFamille } = require("./Routes/famillesRoute")
+
+
+
+const { routerUtilisateur } = require("./Routes/utilisateurRoute");
+const { routerParametre } = require("./Routes/parametreRoute");
+const { routerReclamation } = require("./Routes/etat-reclamationRoute");
 const { routerTypeDepartement } = require("./Routes/typeDepartementRoute")
 
 
-
-
-
-//const { routerUtilisateur } = require("./Routes/utilisateurRoute")
-
-
-
-
-
+const { routerTypeEquipement } = require("./Routes/type-equipementRoute");
 
 
 
@@ -30,12 +30,12 @@ const { routerTypeDepartement } = require("./Routes/typeDepartementRoute")
 
 
 mongoose.connect("mongodb://localhost/shopBD", { useUnifiedTopology: true, useNewUrlParser: true })
-.then(console.log("connected to mongodb"))
-.catch(err => console.log(err))
+    .then(console.log("connected to mongodb"))
+    .catch(err => console.log(err))
 
- /*mongoose.connect("mongodb://localhost/shopBD", { useUnifiedTopology: true, useNewUrlParser: true, username: "JR-Test", password: "test" })
- .then(console.log("connected to mongodb"))
- .catch(err => console.log(err))*/
+/*mongoose.connect("mongodb://localhost/shopBD", { useUnifiedTopology: true, useNewUrlParser: true, username: "JR-Test", password: "test" })
+.then(console.log("connected to mongodb"))
+.catch(err => console.log(err))*/
 
 app.use(express.json())
 
@@ -52,12 +52,15 @@ app.use(express.json())
 //app.use(allowCrossDomain);
 
 
-
-app.use('/typeDepartements', routerTypeDepartement)
-
-//app.use('/utilisateurs', routerUtilisateur)
+app.use('/typeequipement', routerTypeEquipement)
+app.use('/familles', routerFamille)
+app.use('/utilisateurs', routerUtilisateur)
+app.use('/reclamations', routerReclamation)
 
 app.use('/transporteurs', routerTransporteur)
+app.use('/parametres', routerParametre)
+app.use('/typeDepartements', routerTypeDepartement)
+
 //app.use('/images',express.static(path.join('images')))
 
 
@@ -66,17 +69,17 @@ app.use(express.static('images'));
 
 app.use('/images', express.static(__dirname + '/images/'));
 
-app.listen(4000,() => {
-    console.log("here is console for backend")
-})
+// app.listen(4000,() => {
+//     console.log("here is console for backend")
+// })
 
 
 
 
 /*app.all('*', function (req, res) {
 	res.sendFile(__dirname + "/public/index.html");
-});
+});*/
 
 app.listen(process.env.PORT || 5000, () => {
-	console.log("server conected to port 5000")
-})*/
+    console.log("server conected to port 5000")
+})
