@@ -80,6 +80,6 @@ app.use('/images', express.static(__dirname + '/images/'));
 	res.sendFile(__dirname + "/public/index.html");
 });*/
 
-app.listen(process.env.PORT || 5000, () => {
-    console.log("server conected to port 5000")
+app.listen(process.env.PORT || 4000, () => {
+    console.log("server conected to port 4000")
 })
