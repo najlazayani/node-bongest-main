@@ -78,13 +78,14 @@ router.post('/deleteFamille/:id', async(req, res) => {
     if (!famille) return res.status(401).send({ status: false })
 
 
-    if (await Famille.findOneAndDelete({ _id: req.params.id })) {
+    if (await famille.findOneAndDelete({ _id: req.params.id })) {
         return res.send({ status: true })
     } else {
         return res.send({ status: false })
     }
 
 })
+
 
 const myCustomLabels = {
     totalDocs: 'itemCount',
