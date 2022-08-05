@@ -1,4 +1,4 @@
-const { Famille, validateFamille } = require('../Models/familleModel')
+const { Documentation, validateDocumentation } = require('../Models/DocumentationModel')
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken');
@@ -13,18 +13,34 @@ var ObjectId = require('mongodb').ObjectID;
 
 var storage = multer.diskStorage({
     destination: function(req, file, cb) {
-        cb(null, 'uploads')
+        cb(null, 'fichiers')
     },
     filename: function(req, file, cb) {
-        cb(null, file.originalname + Date.now())
+        console.log(file);
+
+        cb(null, Date.now() + file.originalname);
     }
 })
 
 
 var upload = multer({ storage: storage })
 
+router.post('/', upload.single('file'), function(req, res, next) {
+    if (!req.file) {
+        return res.status(500).send({ message: 'Upload fail' });
+    } else {
+        req.body.imageUrl = 'http://192.168.0.7:4000/fichiers/' + req.file.filename;
+        Documentation.create(req.body, function(err, documentation) {
+            if (err) {
+                console.log(err);
+                return next(err);
+            }
+            res.json(documentation);
+        });
+    }
+});
 
-router.post('/upload', upload.array('myFiles'), async(req, res) => {
+router.post('/fichiers', upload.array('myFiles'), async(req, res) => {
     const files = req.files
     let arr = [];
     files.forEach(element => {
@@ -33,14 +49,16 @@ router.post('/upload', upload.array('myFiles'), async(req, res) => {
     return res.send(arr)
 })
 
-router.post('/newFamille', async(req, res) => {
+
+
+
+router.post('/newDocumentation', async(req, res) => {
 
     var body = req.body
 
+    const documentation = new Documentation(body);
 
-    const famille = new Famille(body);
-
-    const result = await famille.save()
+    const result = await documentation.save()
 
     return res.send({ status: true, resultat: result })
 })
@@ -48,43 +66,40 @@ router.post('/newFamille', async(req, res) => {
 
 
 
-router.post('/modifierFamille/:id', async(req, res) => {
+router.post('/modifierDocumentation/:id', async(req, res) => {
 
-    console.log(req.body);
+    console.log("modifier", req.body);
+    const documentation = await Documentation.findById(req.params.id)
 
-    const famille = await Famille.findById(req.params.id)
-    console.log(req.params.id);
-    console.log("famille");
-    console.log(famille);
+    if (!documentation) return res.status(401).send({ status: false })
 
-    if (!famille) {
-        return
-        res.status(401).send({ status: false })
-    }
+    const result = await Documentation.findOneAndUpdate({ _id: req.params.id }, req.body)
 
-    const result = await Famille.findOneAndUpdate({ _id: req.params.id }, req.body)
-
-    const famille2 = await Famille.findById(req.params.id);
-    console.log(famille2);
-
-    return res.send({ status: true, resultat: famille2 })
+    const documentation2 = await Documentation.findById(req.params.id)
+    console.log("test modifier");
+    console.log(documentation2);
+    return res.send({ status: true, resultat: documentation2 })
 })
 
-router.post('/deleteFamille/:id', async(req, res) => {
 
 
-    const famille = await Famille.findById(req.params.id)
+router.post('/deleteDocumentation/:id', async(req, res) => {
 
-    if (!famille) return res.status(401).send({ status: false })
+    //if(req.user.user.role != "admin") return res.status(401).send({status:false})
+
+    const documentation = await Documentation.findById(req.params.id)
+
+    if (!documentation) return res.status(401).send({ status: false })
 
 
-    if (await Famille.findOneAndDelete({ _id: req.params.id })) {
+    if (await Documentation.findOneAndDelete({ _id: req.params.id })) {
         return res.send({ status: true })
     } else {
         return res.send({ status: false })
     }
 
 })
+
 
 const myCustomLabels = {
     totalDocs: 'itemCount',
@@ -101,7 +116,8 @@ const myCustomLabels = {
 
 
 
-router.post('/listFamille', async(req, res) => {
+
+router.post('/listDocumentation', async(req, res) => {
 
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
 
@@ -149,11 +165,11 @@ router.post('/listFamille', async(req, res) => {
     var result = []
 
     if (listFilter.length > 1) {
-        result = await Famille.paginate({ $and: listFilter }, options)
+        result = await Documentation.paginate({ $and: listFilter }, options)
     } else if (listFilter.length == 1) {
-        result = await Famille.paginate(listFilter[0], options)
+        result = await Documentation.paginate(listFilter[0], options)
     } else {
-        result = await Famille.paginate({}, options)
+        result = await Documentation.paginate({}, options)
     }
 
     return res.send({ status: true, resultat: result, request: req.body })
@@ -161,21 +177,22 @@ router.post('/listFamille', async(req, res) => {
 })
 
 
+
 router.get('/getById/:id', async(req, res) => {
 
     if (req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({ status: false })
 
-    const famille = await Famille.findOne({ _id: req.params.id })
+    const documentation = await Documentation.findOne({ _id: req.params.id })
 
-    return res.send({ status: true, resultat: famille })
+    return res.send({ status: true, resultat: documentation })
 
 })
 
 router.get('/getAllParametres', async(req, res) => {
 
-    const familles = await Famille.find({})
+    const documentations = await Documentation.find({})
 
-    return res.send({ status: true, familles: familles })
+    return res.send({ status: true, documentations: documentations })
 })
 
 function verifytoken(req, res, next) {
@@ -201,4 +218,4 @@ function verifytoken(req, res, next) {
 
 }
 
-module.exports.routerFamille = router
+module.exports.routerDocumentation = router

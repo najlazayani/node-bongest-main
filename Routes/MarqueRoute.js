@@ -1,4 +1,4 @@
-const { Famille, validateFamille } = require('../Models/familleModel')
+const { Marque, validateMarque } = require('../Models/MarqueModel')
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken');
@@ -33,14 +33,14 @@ router.post('/upload', upload.array('myFiles'), async(req, res) => {
     return res.send(arr)
 })
 
-router.post('/newFamille', async(req, res) => {
+router.post('/newMarque', async(req, res) => {
 
     var body = req.body
 
 
-    const famille = new Famille(body);
+    const marque = new Marque(body);
 
-    const result = await famille.save()
+    const result = await marque.save()
 
     return res.send({ status: true, resultat: result })
 })
@@ -48,37 +48,37 @@ router.post('/newFamille', async(req, res) => {
 
 
 
-router.post('/modifierFamille/:id', async(req, res) => {
+router.post('/modifierMarque/:id', async(req, res) => {
 
     console.log(req.body);
 
-    const famille = await Famille.findById(req.params.id)
+    const marque = await Marque.findById(req.params.id)
     console.log(req.params.id);
-    console.log("famille");
-    console.log(famille);
+    console.log("marque");
+    console.log(marque);
 
-    if (!famille) {
+    if (!marque) {
         return
         res.status(401).send({ status: false })
     }
 
-    const result = await Famille.findOneAndUpdate({ _id: req.params.id }, req.body)
+    const result = await Marque.findOneAndUpdate({ _id: req.params.id }, req.body)
 
-    const famille2 = await Famille.findById(req.params.id);
-    console.log(famille2);
+    const marque2 = await Marque.findById(req.params.id);
+    console.log(marque2);
 
-    return res.send({ status: true, resultat: famille2 })
+    return res.send({ status: true, resultat: marque2 })
 })
 
-router.post('/deleteFamille/:id', async(req, res) => {
+router.post('/deleteMarque/:id', async(req, res) => {
 
 
-    const famille = await Famille.findById(req.params.id)
+    const marque = await Marque.findById(req.params.id)
 
-    if (!famille) return res.status(401).send({ status: false })
+    if (!marque) return res.status(401).send({ status: false })
 
 
-    if (await Famille.findOneAndDelete({ _id: req.params.id })) {
+    if (await Marque.findOneAndDelete({ _id: req.params.id })) {
         return res.send({ status: true })
     } else {
         return res.send({ status: false })
@@ -101,9 +101,8 @@ const myCustomLabels = {
 
 
 
-router.post('/listFamille', async(req, res) => {
+router.post('/listMarque', async(req, res) => {
 
-    //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
 
     var sort = {}
     for (let key in req.body.orderBy) {
@@ -149,11 +148,11 @@ router.post('/listFamille', async(req, res) => {
     var result = []
 
     if (listFilter.length > 1) {
-        result = await Famille.paginate({ $and: listFilter }, options)
+        result = await Marque.paginate({ $and: listFilter }, options)
     } else if (listFilter.length == 1) {
-        result = await Famille.paginate(listFilter[0], options)
+        result = await Marque.paginate(listFilter[0], options)
     } else {
-        result = await Famille.paginate({}, options)
+        result = await Marque.paginate({}, options)
     }
 
     return res.send({ status: true, resultat: result, request: req.body })
@@ -165,17 +164,17 @@ router.get('/getById/:id', async(req, res) => {
 
     if (req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({ status: false })
 
-    const famille = await Famille.findOne({ _id: req.params.id })
+    const marque = await Marque.findOne({ _id: req.params.id })
 
-    return res.send({ status: true, resultat: famille })
+    return res.send({ status: true, resultat: marque })
 
 })
 
 router.get('/getAllParametres', async(req, res) => {
 
-    const familles = await Famille.find({})
+    const marques = await Marque.find({})
 
-    return res.send({ status: true, familles: familles })
+    return res.send({ status: true, marques: marques })
 })
 
 function verifytoken(req, res, next) {
@@ -201,4 +200,4 @@ function verifytoken(req, res, next) {
 
 }
 
-module.exports.routerFamille = router
+module.exports.routerMarque = router
