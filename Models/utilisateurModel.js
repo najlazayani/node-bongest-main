@@ -8,14 +8,14 @@ const Schema1 = mongoose.Schema
 const schemaUtilisateur = mongoose.Schema({
     nom: { type: String, default: 0 },
     prenom: { type: String, default: 0 },
-    //  role: { type: Schema.Types.ObjectId, ref: 'Role', default: 'null' },
+    role: { type: Schema.Types.ObjectId, ref: 'Role', default: 'null' },
     login: { type: String, default: "", unique: true },
     email: { type: String, default: "", unique: true },
     password: { type: String, default: "" },
-    // telephone: { type: String, default: 0 },
-    // adresse: { type: String, default: 0 },
+    telephone: { type: String, default: 0 },
+    adresse: { type: String, default: 0 },
     codeForgotPassword: { type: String, default: "" },
-    // societeRacine: { type: Schema.Types.ObjectId, ref: 'Societe', default: 'null' },
+    societeRacine: { type: Schema.Types.ObjectId, ref: 'Societe', default: 'null' },
 }, { timestamps: true })
 
 schemaUtilisateur.plugin(mongoosePaginate);
@@ -33,13 +33,13 @@ function validateUtilisateur(Utilisateur) {
     let schema = Joi.object({
         nom: Joi.string().allow('', null),
         prenom: Joi.string().allow('', null),
-        // role: Joi.string().allow('', null),
+        role: Joi.string().allow('', null),
         email: Joi.string().allow('', null),
         password: Joi.string().allow('', null),
-        // telephone: Joi.string().allow('', null),
-        // adresse: Joi.string().allow('', null),
+        telephone: Joi.string().allow('', null),
+        adresse: Joi.string().allow('', null),
         codeForgotPassword: Joi.string().allow('', null),
-        //societeRacine: Joi.string().allow('', null),
+        societeRacine: Joi.string().allow('', null),
 
     })
 

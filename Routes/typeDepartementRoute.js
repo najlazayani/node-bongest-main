@@ -188,8 +188,8 @@ router.get('/getById/:id', async(req, res) => {
 
 })
 
-router.get('/getAllParametres', async(req,res)=>{
-    
+router.post('/getAllParametres', verifytoken, async(req, res) => {
+
     const typeDepartements = await TypeDepartement.find({})
 
     return res.send({ status: true, typeDepartements: typeDepartements })
