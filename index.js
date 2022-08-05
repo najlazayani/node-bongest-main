@@ -9,7 +9,7 @@ const mongoose = require("mongoose")
 app.use(cors());
 
 const { routerTransporteur } = require("./Routes/transporteurRoute")
-const { routerTypeDepartement } = require("./Routes/typeDepartementRoute");
+//const { routerTypeDepartement } = require("./Routes/typeDepartementRoute");
 const { routerTaxe } = require("./Routes/taxeRoute");
 const { routerTypeCompteur } = require("./Routes/typeCompteurRoute");
 const { routerFamilleProduit } = require("./Routes/familleProduitRoute");
@@ -27,14 +27,18 @@ const { routerTypeDepartement } = require("./Routes/typeDepartementRoute")
 
 
 const { routerTypeEquipement } = require("./Routes/type-equipementRoute");
+const { routerPlat } = require("./Routes/platRoute");
 
+const { routerFamilleArticle } = require("./Routes/familleArticleRoute");
+const {routerReclamationDefaut} = require("./Routes/reclamationDefautRoute");
 
+//const {routerReclamationDefaut} = require("/Routes/reclamationDefautRoute");
+const {routerTypeAction} = require("./Routes/typeActionRoute");
+const {routerServiceBt} = require("./Routes/serviceBtRoute");
 
+const{routerControle} = require("./Routes/controleRoute");
 
-
-
-
-
+const{routerEtatDemandeAchat} = require("./Routes/etatDemandeAchatRoute");
 mongoose.connect("mongodb://localhost/shopBD", { useUnifiedTopology: true, useNewUrlParser: true })
     .then(console.log("connected to mongodb"))
     .catch(err => console.log(err))
@@ -75,6 +79,14 @@ app.use('/taxe', routerTaxe)
 app.use('/typeCompteurs', routerTypeCompteur)
 app.use('/FamilleProduits', routerFamilleProduit)
 app.use('/TypePlats', routerTypePlat)
+app.use('/plats',routerPlat)
+app.use('/FamilleArticle',routerFamilleArticle);
+ app.use('/ReclamationDefaut',routerReclamationDefaut);
+ app.use('/TypeAction',routerTypeAction);
+ app.use('/ServiceBT',routerServiceBt);
+ app.use('/Controle',routerControle);
+ app.use('/EtatDemandeAchat',routerEtatDemandeAchat);
+
 //app.use('/images',express.static(path.join('images')))
 
 
@@ -87,6 +99,7 @@ app.use('/images', express.static(__dirname + '/images/'));
 //     console.log("here is console for backend")
 // })
 
+app.use(express.json()) 
 
 
 
@@ -94,6 +107,6 @@ app.use('/images', express.static(__dirname + '/images/'));
 	res.sendFile(__dirname + "/public/index.html");
 });*/
 
-app.listen(process.env.PORT || 5000, () => {
-    console.log("server conected to port 5000")
+app.listen(process.env.PORT || 4000, () => {
+    console.log("server conected to port 4000")
 })

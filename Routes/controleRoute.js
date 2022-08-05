@@ -1,4 +1,4 @@
-const { TypeDepartement, validateTypeDepartement } = require('../Models/typeDepartementModel')
+const { Controle, validateControle } = require('../Models/controleModel')
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken');
@@ -25,22 +25,22 @@ var storage = multer.diskStorage({
 
 var upload = multer({ storage: storage })
 
-router.post('/', upload.single('file'),verifytoken, function(req, res, next) {
+router.post('/', upload.single('file'), function(req, res, next) {
     if (!req.file) {
         return res.status(500).send({ message: 'Upload fail' });
     } else {
         req.body.imageUrl = 'http://192.168.0.7:4000/images/' + req.file.filename;
-        TypeDepartement.create(req.body, function(err, typeDepartement) {
+        Controle.create(req.body, function(err, controle) {
             if (err) {
                 console.log(err);
                 return next(err);
             }
-            res.json(typeDepartement);
+            res.json(controle);
         });
     }
 });
 
-router.post('/images', upload.array('myFiles'),verifytoken, async(req, res) => {
+router.post('/images', upload.array('myFiles'), async(req, res) => {
     const files = req.files
     let arr = [];
     files.forEach(element => {
@@ -52,13 +52,13 @@ router.post('/images', upload.array('myFiles'),verifytoken, async(req, res) => {
 
 
 
-router.post('/newTypeDepartement',verifytoken, async(req, res) => {
+router.post('/newControle', async(req, res) => {
 
     var body = req.body
 
-    const typeDepartement = new TypeDepartement(body);
+    const controle = new Controle(body);
 
-    const result = await typeDepartement.save()
+    const result = await controle.save()
 
     return res.send({ status: true, resultat: result })
 })
@@ -66,33 +66,33 @@ router.post('/newTypeDepartement',verifytoken, async(req, res) => {
 
 
 
-router.post('/modifierTypeDepartement/:id',verifytoken, async(req, res) => {
+router.post('/modifierControle/:id', async(req, res) => {
 
     console.log("modifier", req.body);
-    const typeDepartement = await TypeDepartement.findById(req.params.id)
+    const controle = await Controle.findById(req.params.id)
 
-    if (!typeDepartement) return res.status(401).send({ status: false })
+    if (!controle) return res.status(401).send({ status: false })
 
-    const result = await TypeDepartement.findOneAndUpdate({ _id: req.params.id }, req.body)
+    const result = await Controle.findOneAndUpdate({ _id: req.params.id }, req.body)
 
-    const typedepartement2 = await TypeDepartement.findById(req.params.id)
+    const controle2 = await Controle.findById(req.params.id)
     console.log("test modifier");
-    console.log(typedepartement2);
-    return res.send({ status: true, resultat: typedepartement2 })
+    console.log(controle2);
+    return res.send({ status: true, resultat: controle2 })
 })
 
 
 
-router.post('/deleteTypeDepartement/:id',verifytoken, async(req, res) => {
+router.post('/deleteControle/:id', async(req, res) => {
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
-    const typeDepartement = await TypeDepartement.findById(req.params.id)
+    const controle = await Controle.findById(req.params.id)
 
-    if (!typeDepartement) return res.status(401).send({ status: false })
+    if (!controle) return res.status(401).send({ status: false })
 
 
-    if (await TypeDepartement.findOneAndDelete({ _id: req.params.id })) {
+    if (await Controle.findOneAndDelete({ _id: req.params.id })) {
         return res.send({ status: true })
     } else {
         return res.send({ status: false })
@@ -117,7 +117,7 @@ const myCustomLabels = {
 
 
 
-router.post('/listTypeDepartements',verifytoken, async(req, res) => {
+router.post('/listControles', async(req, res) => {
 
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
 
@@ -165,11 +165,11 @@ router.post('/listTypeDepartements',verifytoken, async(req, res) => {
     var result = []
 
     if (listFilter.length > 1) {
-        result = await TypeDepartement.paginate({ $and: listFilter }, options)
+        result = await Controle.paginate({ $and: listFilter }, options)
     } else if (listFilter.length == 1) {
-        result = await TypeDepartement.paginate(listFilter[0], options)
+        result = await Controle.paginate(listFilter[0], options)
     } else {
-        result = await TypeDepartement.paginate({}, options)
+        result = await Controle.paginate({}, options)
     }
 
     return res.send({ status: true, resultat: result, request: req.body })
@@ -178,21 +178,21 @@ router.post('/listTypeDepartements',verifytoken, async(req, res) => {
 
 
 
-router.get('/getById/:id', verifytoken,async(req, res) => {
+router.get('/getById/:id', async(req, res) => {
 
     if (req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({ status: false })
 
-    const typeDepartement = await TypeDepartement.findOne({ _id: req.params.id })
+    const controle = await Controle.findOne({ _id: req.params.id })
 
-    return res.send({ status: true, resultat: typeDepartement })
+    return res.send({ status: true, resultat: controle })
 
 })
 
-router.get('/getAllParametres',verifytoken, async(req,res)=>{
+router.get('/getAllParametres', async(req,res)=>{
     
-    const typeDepartements = await TypeDepartement.find({})
+    const controles = await Controle.find({})
 
-    return res.send({ status: true, typeDepartements: typeDepartements })
+    return res.send({ status: true, controles: controles })
 })
 
 function verifytoken(req, res, next) {
@@ -218,4 +218,4 @@ function verifytoken(req, res, next) {
 
 }
 
-module.exports.routerTypeDepartement = router
+module.exports.routerControle = router

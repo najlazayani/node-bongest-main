@@ -7,7 +7,7 @@ const Schema1 = mongoose.Schema
 
 const schemaPlat=mongoose.Schema({
         libelle:{type:String,default: ""},
-        typePlat:{type:String,default: 0}
+        typePlat:{type: Schema.Types.ObjectId, ref: 'TypePlat'}
   
     },
     { timestamps: true }

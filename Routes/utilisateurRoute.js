@@ -177,14 +177,14 @@ router.post('/upload',upload.array('myFiles'),async(req,res)=>{
  *
  */
 
-router.post('/newUtilisateur', verifytoken, async(req,res)=>{
+router.post('/newUtilisateur', verifytoken,async(req,res)=>{
 
     //const {error}=validateUtilisateur(req.body)
     //if(error) return res.status(400).send({status:false,message:error.details[0].message})
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
-    req.body.societeRacine = await getSocieteRacine(ObjectId(req.body.societe))
+    //req.body.societeRacine = await getSocieteRacine(ObjectId(req.body.societe))
 
     const emailExist = await Utilisateur.findOne({ email: req.body.email});
     if(emailExist) return res.send({status:false,message:'Votre email est déjà existé'})
@@ -198,13 +198,12 @@ router.post('/newUtilisateur', verifytoken, async(req,res)=>{
     const utilisateur = new Utilisateur({
         nom:req.body.nom,
         prenom:req.body.prenom,
-        telephone:req.body.telephone,
-        adresse:req.body.adresse,
-        role:req.body.role,
+        
+        
         email:req.body.email,
         login:req.body.login,
         password: hashPassword,
-        societeRacine:req.body.societeRacine,
+        //societeRacine:req.body.societeRacine,
     })
 
     var result=await utilisateur.save()
@@ -312,9 +311,7 @@ router.post('/modifierUtilisateur/:id', verifytoken, async(req,res)=>{
     var result = await Utilisateur.findByIdAndUpdate(user.id, {
         nom:req.body.nom,
         prenom:req.body.prenom,
-        telephone:req.body.telephone,
-        adresse:req.body.adresse,
-        role:req.body.role,
+   
         email:req.body.email,
         login:req.body.login,
     })
@@ -492,11 +489,11 @@ const myCustomLabels = {
  *
  */
 
- router.post('/listUtilisateurs', verifytoken, async(req,res)=>{
+ router.post('/listUtilisateurs',  async(req,res)=>{
   
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
 
-    var societeRacine = await getSocieteRacine(ObjectId(req.body.societe))
+  //  var societeRacine = await getSocieteRacine(ObjectId(req.body.societe))
 
     var sort = {}
     for( let key in req.body.orderBy){
@@ -512,7 +509,7 @@ const myCustomLabels = {
     var pipeline = []
    
 
-    pipeline.push({ $match : {societeRacine : societeRacine} } )
+    //pipeline.push({ $match : {societeRacine : societeRacine} } )
 
     
     pipeline.push({
@@ -665,7 +662,7 @@ const myCustomLabels = {
  *       500:
  *         description: Some error happened
  */
-router.get('/getById/:id', verifytoken, async(req,res)=>{
+router.get('/getById/:id',  async(req,res)=>{
 
     if(req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({status:false})
 
@@ -677,16 +674,17 @@ router.get('/getById/:id', verifytoken, async(req,res)=>{
 
 
 router.post('/login', async(req,res)=>{
-    
+    console.log("hello ")
     /*const {error}=validateLogin(req.body)
     if(error) return res.status(400).send({status:false,message:error.details[0].message})
     */
+   console.log("step 1")
     var user = await Utilisateur.findOne({$or: [{ email: req.body.email}, {login: req.body.email}]});
-   
-    var user2 = await Utilisateur.findOne({$or: [{ email: req.body.email}, {login: req.body.email}]}).populate('role');
+    console.log("step 2")
+    //var user2 = await Utilisateur.findOne({$or: [{ email: req.body.email}, {login: req.body.email}]}).populate('role');
     
     if(!user) return res.send({status:false, message:'errorLogin'});
-
+console.log("user test"+user)
     const validPass = await bcrypt.compare(req.body.password, user.password);
     if(!validPass) return res.send({status:false, message:'errorLogin'})    
 
@@ -699,7 +697,8 @@ router.post('/login', async(req,res)=>{
     user.password = undefined
 
     jwt.sign({user}, 'secretkey', (err, token) => {
-        res.json({status:true, token:token, user: user2});
+        console.log(token)
+        res.json({status:true, token:token, user: user});
     });
 
 })

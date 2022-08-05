@@ -1,4 +1,4 @@
-const {TypePlat, validateTypePlat} =require('../Models/typePlatModel')
+const {Plat, validatePlat} =require('../Models/platModel')
 const express=require('express')
 const router=express.Router()
 const jwt = require('jsonwebtoken');
@@ -7,20 +7,21 @@ var multer = require('multer');
 const fs = require('fs');
 
 var dateFormat = require('dateformat');
-const { Plat } = require('../Models/platModel');
+
 
 var ObjectId = require('mongodb').ObjectID;
+const {TypePlat, validateTypePlat} =require('../Models/typePlatModel')
 
 
 
-router.post('/newTypePlat', async(req,res)=>{
+router.post('/newPlat', async(req,res)=>{
 
     var body = req.body 
 
     
-    const typePlat=new TypePlat(body);
+    const plat=new Plat(body);
 
-    const result=await typePlat.save()
+    const result=await plat.save()
 
     return res.send({status:true,resultat:result})
 })
@@ -33,54 +34,40 @@ router.post('/newTypePlat', async(req,res)=>{
 
 
 
-router.post('/modifierTypePlat/:id', async(req,res)=>{
+router.post('/modifierPlat/:id', async(req,res)=>{
 
     console.log(req.body);
 
-    const typePlat = await TypePlat.findById(req.params.id)
+    const plat = await Plat.findById(req.params.id)
     
 
-    if(!typePlat) {
+    if(!plat) {
         return 
          res.status(401).send({status:false})}
         
-    const result = await TypePlat.findOneAndUpdate({_id:req.params.id}, req.body)
+    const result = await Plat.findOneAndUpdate({_id:req.params.id}, req.body)
 
-     const typePlat2 = await TypePlat.findById(req.params.id);
-     console.log(typePlat2);
+     const plat2 = await Plat.findById(req.params.id);
+     console.log(plat2);
 
-     return res.send({status:true,resultat:typePlat2})})
+     return res.send({status:true,resultat:plat2})})
 
 
 
-router.post('/deleteTypePlat/:id', async(req,res)=>{
+router.post('/deletePlat/:id', async(req,res)=>{
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
-    const typePlat = await TypePlat.findById(req.params.id)
-const plats = await Plat.find({typePlat:typePlat.id})
-//console.log("plats for delete")
-//console.log(plats);
-   
-    if(!typePlat) return res.status(401).send({status:false})
+    const plat = await Plat.findById(req.params.id)
+
+    if(!plat) return res.status(401).send({status:false})
 
 
-    if(await TypePlat.findOneAndDelete({_id:req.params.id})){
-        for (let key in plats) {
-            //console.log("plats id for delete")
-            //console.log(plats[key].id);
-            if(await Plat.findOneAndDelete({_id:plats[key].id})){
-                return res.send({status:true})
-            }else{
-                return res.send({status:false})
-            }
-          }
-          
+    if(await Plat.findOneAndDelete({_id:req.params.id})){
         return res.send({status:true})
     }else{
         return res.send({status:false})
     }
-
 
 })
 
@@ -101,7 +88,7 @@ const myCustomLabels = {
 
 
 
- router.post('/listTypePlat', async(req,res)=>{
+ router.post('/listPlat', async(req,res)=>{
   
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
   
@@ -142,19 +129,20 @@ const myCustomLabels = {
         page: Number(req.body.page),
         limit: Number(req.body.limit),
         customLabels: myCustomLabels,
-        //populate: 'client'
+        populate: 'typePlat',
         sort:sort
     };
 
     var result = []
     
     if(listFilter.length > 1){
-      result = await  TypePlat.paginate({$and:listFilter}, options) 
+      result = await  Plat.paginate({$and:listFilter}, options) 
     }else if(listFilter.length == 1){
-      result = await  TypePlat.paginate(listFilter[0], options)
+      result = await  Plat.paginate(listFilter[0], options)
     }else{
-      result = await  TypePlat.paginate({}, options)
+      result = await  Plat.paginate({}, options)
     }
+
 
     return res.send({status:true, resultat:result, request:req.body})
     
@@ -166,18 +154,25 @@ router.get('/getById/:id', async(req,res)=>{
 
     if(req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({status:false})
 
-    const typePlat = await TypePlat.findOne({_id:req.params.id})
+    const plat = await Plat.findOne({_id:req.params.id})
 
-    return res.send({status:true,resultat:typePlat})
+    return res.send({status:true,resultat:plat})
 
 })
 
 router.get('/getAllParametres',  async(req,res)=>{
     
+    const plats = await Plat.find({})
     const typePlats = await TypePlat.find({})
-    
     return res.send({status:true, typePlats:typePlats}) 
 })
+router.get('/getAllParametres2',  async(req,res)=>{
+    
+    const plats = await Plat.find({})
+    
+    return res.send({status:true, plats:plats}) 
+})
+
 
 function verifytoken(req, res, next){
     const bearerHeader = req.headers['authorization'];
@@ -202,4 +197,4 @@ function verifytoken(req, res, next){
 
 }
 
-module.exports.routerTypePlat=router
+module.exports.routerPlat=router

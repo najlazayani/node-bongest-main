@@ -1,4 +1,4 @@
-const {TypePlat, validateTypePlat} =require('../Models/typePlatModel')
+const {TypeAction, validateTypeAction} =require('../Models/typeActionModel')
 const express=require('express')
 const router=express.Router()
 const jwt = require('jsonwebtoken');
@@ -13,14 +13,14 @@ var ObjectId = require('mongodb').ObjectID;
 
 
 
-router.post('/newTypePlat', async(req,res)=>{
+router.post('/newTypeAction', verifytoken,async(req,res)=>{
 
     var body = req.body 
 
     
-    const typePlat=new TypePlat(body);
+    const typeAction=new TypeAction(body);
 
-    const result=await typePlat.save()
+    const result=await typeAction.save()
 
     return res.send({status:true,resultat:result})
 })
@@ -33,39 +33,39 @@ router.post('/newTypePlat', async(req,res)=>{
 
 
 
-router.post('/modifierTypePlat/:id', async(req,res)=>{
+router.post('/modifierTypeAction/:id', verifytoken,async(req,res)=>{
 
     console.log(req.body);
 
-    const typePlat = await TypePlat.findById(req.params.id)
+    const typeAction = await TypeAction.findById(req.params.id)
     
 
-    if(!typePlat) {
+    if(!typeAction) {
         return 
          res.status(401).send({status:false})}
         
-    const result = await TypePlat.findOneAndUpdate({_id:req.params.id}, req.body)
+    const result = await TypeAction.findOneAndUpdate({_id:req.params.id}, req.body)
 
-     const typePlat2 = await TypePlat.findById(req.params.id);
-     console.log(typePlat2);
+     const typeAction2 = await TypeAction.findById(req.params.id);
+     console.log(typeAction2);
 
-     return res.send({status:true,resultat:typePlat2})})
+     return res.send({status:true,resultat:typeAction2})})
 
 
 
-router.post('/deleteTypePlat/:id', async(req,res)=>{
+router.post('/deleteTypeAction/:id',verifytoken, async(req,res)=>{
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
-    const typePlat = await TypePlat.findById(req.params.id)
-const plats = await Plat.find({typePlat:typePlat.id})
+    const typeAction = await TypeAction.findById(req.params.id)
+const plats = await Plat.find({typeAction:typeAction.id})
 //console.log("plats for delete")
 //console.log(plats);
    
-    if(!typePlat) return res.status(401).send({status:false})
+    if(!typeAction) return res.status(401).send({status:false})
 
 
-    if(await TypePlat.findOneAndDelete({_id:req.params.id})){
+    if(await TypeAction.findOneAndDelete({_id:req.params.id})){
         for (let key in plats) {
             //console.log("plats id for delete")
             //console.log(plats[key].id);
@@ -101,7 +101,7 @@ const myCustomLabels = {
 
 
 
- router.post('/listTypePlat', async(req,res)=>{
+ router.post('/listTypeAction', verifytoken,async(req,res)=>{
   
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
   
@@ -149,11 +149,11 @@ const myCustomLabels = {
     var result = []
     
     if(listFilter.length > 1){
-      result = await  TypePlat.paginate({$and:listFilter}, options) 
+      result = await  TypeAction.paginate({$and:listFilter}, options) 
     }else if(listFilter.length == 1){
-      result = await  TypePlat.paginate(listFilter[0], options)
+      result = await  TypeAction.paginate(listFilter[0], options)
     }else{
-      result = await  TypePlat.paginate({}, options)
+      result = await  TypeAction.paginate({}, options)
     }
 
     return res.send({status:true, resultat:result, request:req.body})
@@ -162,21 +162,21 @@ const myCustomLabels = {
 
 
 
-router.get('/getById/:id', async(req,res)=>{
+router.get('/getById/:id', verifytoken,async(req,res)=>{
 
     if(req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({status:false})
 
-    const typePlat = await TypePlat.findOne({_id:req.params.id})
+    const typeAction = await TypeAction.findOne({_id:req.params.id})
 
-    return res.send({status:true,resultat:typePlat})
+    return res.send({status:true,resultat:typeAction})
 
 })
 
-router.get('/getAllParametres',  async(req,res)=>{
+router.get('/getAllParametres',verifytoken,  async(req,res)=>{
     
-    const typePlats = await TypePlat.find({})
+    const typeActions = await TypeAction.find({})
     
-    return res.send({status:true, typePlats:typePlats}) 
+    return res.send({status:true, typeActions:typeActions}) 
 })
 
 function verifytoken(req, res, next){
@@ -202,4 +202,4 @@ function verifytoken(req, res, next){
 
 }
 
-module.exports.routerTypePlat=router
+module.exports.routerTypeAction=router

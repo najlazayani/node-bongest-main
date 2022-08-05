@@ -1,4 +1,4 @@
-const {TypePlat, validateTypePlat} =require('../Models/typePlatModel')
+const {ServiceBt, validateServiceBt} =require('../Models/serviceBtModel')
 const express=require('express')
 const router=express.Router()
 const jwt = require('jsonwebtoken');
@@ -13,14 +13,14 @@ var ObjectId = require('mongodb').ObjectID;
 
 
 
-router.post('/newTypePlat', async(req,res)=>{
+router.post('/newServiceBt', async(req,res)=>{
 
     var body = req.body 
 
     
-    const typePlat=new TypePlat(body);
+    const serviceBt=new ServiceBt(body);
 
-    const result=await typePlat.save()
+    const result=await serviceBt.save()
 
     return res.send({status:true,resultat:result})
 })
@@ -33,39 +33,39 @@ router.post('/newTypePlat', async(req,res)=>{
 
 
 
-router.post('/modifierTypePlat/:id', async(req,res)=>{
+router.post('/modifierServiceBt/:id', async(req,res)=>{
 
     console.log(req.body);
 
-    const typePlat = await TypePlat.findById(req.params.id)
+    const serviceBt = await ServiceBt.findById(req.params.id)
     
 
-    if(!typePlat) {
+    if(!serviceBt) {
         return 
          res.status(401).send({status:false})}
         
-    const result = await TypePlat.findOneAndUpdate({_id:req.params.id}, req.body)
+    const result = await ServiceBt.findOneAndUpdate({_id:req.params.id}, req.body)
 
-     const typePlat2 = await TypePlat.findById(req.params.id);
-     console.log(typePlat2);
+     const serviceBt2 = await ServiceBt.findById(req.params.id);
+     console.log(serviceBt2);
 
-     return res.send({status:true,resultat:typePlat2})})
+     return res.send({status:true,resultat:serviceBt2})})
 
 
 
-router.post('/deleteTypePlat/:id', async(req,res)=>{
+router.post('/deleteServiceBt/:id', async(req,res)=>{
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
-    const typePlat = await TypePlat.findById(req.params.id)
-const plats = await Plat.find({typePlat:typePlat.id})
+    const serviceBt = await ServiceBt.findById(req.params.id)
+const plats = await Plat.find({serviceBt:serviceBt.id})
 //console.log("plats for delete")
 //console.log(plats);
    
-    if(!typePlat) return res.status(401).send({status:false})
+    if(!serviceBt) return res.status(401).send({status:false})
 
 
-    if(await TypePlat.findOneAndDelete({_id:req.params.id})){
+    if(await ServiceBt.findOneAndDelete({_id:req.params.id})){
         for (let key in plats) {
             //console.log("plats id for delete")
             //console.log(plats[key].id);
@@ -101,7 +101,7 @@ const myCustomLabels = {
 
 
 
- router.post('/listTypePlat', async(req,res)=>{
+ router.post('/listServiceBt', async(req,res)=>{
   
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
   
@@ -149,11 +149,11 @@ const myCustomLabels = {
     var result = []
     
     if(listFilter.length > 1){
-      result = await  TypePlat.paginate({$and:listFilter}, options) 
+      result = await  ServiceBt.paginate({$and:listFilter}, options) 
     }else if(listFilter.length == 1){
-      result = await  TypePlat.paginate(listFilter[0], options)
+      result = await  ServiceBt.paginate(listFilter[0], options)
     }else{
-      result = await  TypePlat.paginate({}, options)
+      result = await  ServiceBt.paginate({}, options)
     }
 
     return res.send({status:true, resultat:result, request:req.body})
@@ -166,17 +166,17 @@ router.get('/getById/:id', async(req,res)=>{
 
     if(req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({status:false})
 
-    const typePlat = await TypePlat.findOne({_id:req.params.id})
+    const serviceBt = await ServiceBt.findOne({_id:req.params.id})
 
-    return res.send({status:true,resultat:typePlat})
+    return res.send({status:true,resultat:serviceBt})
 
 })
 
 router.get('/getAllParametres',  async(req,res)=>{
     
-    const typePlats = await TypePlat.find({})
+    const serviceBts = await ServiceBt.find({})
     
-    return res.send({status:true, typePlats:typePlats}) 
+    return res.send({status:true, serviceBts:serviceBts}) 
 })
 
 function verifytoken(req, res, next){
@@ -202,4 +202,4 @@ function verifytoken(req, res, next){
 
 }
 
-module.exports.routerTypePlat=router
+module.exports.routerServiceBt=router

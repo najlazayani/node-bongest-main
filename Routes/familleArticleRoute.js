@@ -1,4 +1,4 @@
-const {TypePlat, validateTypePlat} =require('../Models/typePlatModel')
+const {FamilleArticle, validateFamilleArticle} =require('../Models/FamilleArticleModel')
 const express=require('express')
 const router=express.Router()
 const jwt = require('jsonwebtoken');
@@ -7,20 +7,18 @@ var multer = require('multer');
 const fs = require('fs');
 
 var dateFormat = require('dateformat');
-const { Plat } = require('../Models/platModel');
 
 var ObjectId = require('mongodb').ObjectID;
 
 
-
-router.post('/newTypePlat', async(req,res)=>{
+router.post('/newFamilleArticle', async(req,res)=>{
 
     var body = req.body 
 
     
-    const typePlat=new TypePlat(body);
+    const familleArticle=new FamilleArticle(body);
 
-    const result=await typePlat.save()
+    const result=await familleArticle.save()
 
     return res.send({status:true,resultat:result})
 })
@@ -33,54 +31,39 @@ router.post('/newTypePlat', async(req,res)=>{
 
 
 
-router.post('/modifierTypePlat/:id', async(req,res)=>{
+router.post('/modifierFamilleArticle/:id', async(req,res)=>{
 
-    console.log(req.body);
+  
 
-    const typePlat = await TypePlat.findById(req.params.id)
-    
+    const familleArticle = await FamilleArticle.findById(req.params.id)
+  
 
-    if(!typePlat) {
+    if(!familleArticle) {
         return 
          res.status(401).send({status:false})}
         
-    const result = await TypePlat.findOneAndUpdate({_id:req.params.id}, req.body)
+    const result = await FamilleArticle.findOneAndUpdate({_id:req.params.id}, req.body)
 
-     const typePlat2 = await TypePlat.findById(req.params.id);
-     console.log(typePlat2);
+     const familleArticle2 = await FamilleArticle.findById(req.params.id);
+    
 
-     return res.send({status:true,resultat:typePlat2})})
+     return res.send({status:true,resultat:familleArticle2})})
 
 
-
-router.post('/deleteTypePlat/:id', async(req,res)=>{
+router.post('/deleteFamilleArticle/:id', async(req,res)=>{
 
     //if(req.user.user.role != "admin") return res.status(401).send({status:false})
 
-    const typePlat = await TypePlat.findById(req.params.id)
-const plats = await Plat.find({typePlat:typePlat.id})
-//console.log("plats for delete")
-//console.log(plats);
-   
-    if(!typePlat) return res.status(401).send({status:false})
+    const familleArticle = await FamilleArticle.findById(req.params.id)
+
+    if(!familleArticle) return res.status(401).send({status:false})
 
 
-    if(await TypePlat.findOneAndDelete({_id:req.params.id})){
-        for (let key in plats) {
-            //console.log("plats id for delete")
-            //console.log(plats[key].id);
-            if(await Plat.findOneAndDelete({_id:plats[key].id})){
-                return res.send({status:true})
-            }else{
-                return res.send({status:false})
-            }
-          }
-          
+    if(await FamilleArticle.findOneAndDelete({_id:req.params.id})){
         return res.send({status:true})
     }else{
         return res.send({status:false})
     }
-
 
 })
 
@@ -99,9 +82,7 @@ const myCustomLabels = {
 
 
 
-
-
- router.post('/listTypePlat', async(req,res)=>{
+ router.post('/listFamilleArticle', async(req,res)=>{
   
     //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
   
@@ -149,11 +130,11 @@ const myCustomLabels = {
     var result = []
     
     if(listFilter.length > 1){
-      result = await  TypePlat.paginate({$and:listFilter}, options) 
+      result = await  FamilleArticle.paginate({$and:listFilter}, options) 
     }else if(listFilter.length == 1){
-      result = await  TypePlat.paginate(listFilter[0], options)
+      result = await  FamilleArticle.paginate(listFilter[0], options)
     }else{
-      result = await  TypePlat.paginate({}, options)
+      result = await  FamilleArticle.paginate({}, options)
     }
 
     return res.send({status:true, resultat:result, request:req.body})
@@ -166,17 +147,17 @@ router.get('/getById/:id', async(req,res)=>{
 
     if(req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({status:false})
 
-    const typePlat = await TypePlat.findOne({_id:req.params.id})
+    const familleArticle = await FamilleArticle.findOne({_id:req.params.id})
 
-    return res.send({status:true,resultat:typePlat})
+    return res.send({status:true,resultat:familleArticle})
 
 })
 
-router.get('/getAllParametres',  async(req,res)=>{
+router.get('/getAllParametres', async(req,res)=>{
     
-    const typePlats = await TypePlat.find({})
+    const familleArticles = await FamilleArticle.find({})
     
-    return res.send({status:true, typePlats:typePlats}) 
+    return res.send({status:true, familleArticles:familleArticles}) 
 })
 
 function verifytoken(req, res, next){
@@ -202,4 +183,4 @@ function verifytoken(req, res, next){
 
 }
 
-module.exports.routerTypePlat=router
+module.exports.routerFamilleArticle=router
