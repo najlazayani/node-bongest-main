@@ -1,16 +1,14 @@
-const mongoose=require('mongoose')
-const Joi=require('joi')
+const mongoose = require('mongoose')
+const Joi = require('joi')
 const mongoosePaginate = require('mongoose-paginate');
 
 const Schema = mongoose.Schema
 const Schema1 = mongoose.Schema
 
-const schemaTaxe=mongoose.Schema({
-        taux:{type:Number,default:0},
-        
-    },
-    { timestamps: true }
-)
+const schemaTaxe = mongoose.Schema({
+    taux: { type: Number, default: 0 },
+
+}, { timestamps: true })
 
 schemaTaxe.plugin(mongoosePaginate);
 
@@ -20,14 +18,14 @@ schemaTaxe.method("toJSON", function() {
     return object;
 });
 
-const Taxe = mongoose.model('Taxe',schemaTaxe)
+const Taxe = mongoose.model('Taxe', schemaTaxe)
 
-function validateTaxe(Taxe){
+function validateTaxe(Taxe) {
     let schema = Joi.object({
-        taux:Joi.string().allow('', null),
-        
+        taux: Joi.string().allow('', null),
+
     })
     return schema.validate(Taxe)
 }
-module.exports.Taxe=Taxe
-module.exports.validateTaxe=validateTaxe
+module.exports.Taxe = Taxe
+module.exports.validateTaxe = validateTaxe

@@ -1,4 +1,4 @@
-const { Famille, validateFamille } = require('../Models/familleModel')
+const { Fonction, validateFonction } = require('../Models/FonctionModel')
 const express = require('express')
 const router = express.Router()
 const jwt = require('jsonwebtoken');
@@ -33,14 +33,14 @@ router.post('/upload', upload.array('myFiles'), async(req, res) => {
     return res.send(arr)
 })
 
-router.post('/newFamille', async(req, res) => {
+router.post('/newFonction', async(req, res) => {
 
     var body = req.body
 
 
-    const famille = new Famille(body);
+    const fonction = new Fonction(body);
 
-    const result = await famille.save()
+    const result = await fonction.save()
 
     return res.send({ status: true, resultat: result })
 })
@@ -48,37 +48,37 @@ router.post('/newFamille', async(req, res) => {
 
 
 
-router.post('/modifierFamille/:id', async(req, res) => {
+router.post('/modifierFonction/:id', async(req, res) => {
 
     console.log(req.body);
 
-    const famille = await Famille.findById(req.params.id)
+    const fonction = await Fonction.findById(req.params.id)
     console.log(req.params.id);
-    console.log("famille");
-    console.log(famille);
+    console.log("fonction");
+    console.log(fonction);
 
-    if (!famille) {
+    if (!fonction) {
         return
         res.status(401).send({ status: false })
     }
 
-    const result = await Famille.findOneAndUpdate({ _id: req.params.id }, req.body)
+    const result = await Fonction.findOneAndUpdate({ _id: req.params.id }, req.body)
 
-    const famille2 = await Famille.findById(req.params.id);
-    console.log(famille2);
+    const fonction2 = await Fonction.findById(req.params.id);
+    console.log(fonction2);
 
-    return res.send({ status: true, resultat: famille2 })
+    return res.send({ status: true, resultat: fonction2 })
 })
 
-router.post('/deleteFamille/:id', async(req, res) => {
+router.post('/deleteFonction/:id', async(req, res) => {
 
 
-    const famille = await Famille.findById(req.params.id)
+    const fonction = await Fonction.findById(req.params.id)
 
-    if (!famille) return res.status(401).send({ status: false })
+    if (!fonction) return res.status(401).send({ status: false })
 
 
-    if (await Famille.findOneAndDelete({ _id: req.params.id })) {
+    if (await Fonction.findOneAndDelete({ _id: req.params.id })) {
         return res.send({ status: true })
     } else {
         return res.send({ status: false })
@@ -101,9 +101,8 @@ const myCustomLabels = {
 
 
 
-router.post('/listFamille', async(req, res) => {
+router.post('/listFonction', async(req, res) => {
 
-    //if(req.user.user.role != "admin" ) return res.status(400).send({status:false})
 
     var sort = {}
     for (let key in req.body.orderBy) {
@@ -149,11 +148,11 @@ router.post('/listFamille', async(req, res) => {
     var result = []
 
     if (listFilter.length > 1) {
-        result = await Famille.paginate({ $and: listFilter }, options)
+        result = await Fonction.paginate({ $and: listFilter }, options)
     } else if (listFilter.length == 1) {
-        result = await Famille.paginate(listFilter[0], options)
+        result = await Fonction.paginate(listFilter[0], options)
     } else {
-        result = await Famille.paginate({}, options)
+        result = await Fonction.paginate({}, options)
     }
 
     return res.send({ status: true, resultat: result, request: req.body })
@@ -165,17 +164,17 @@ router.get('/getById/:id', async(req, res) => {
 
     if (req.params.id == undefined || req.params.id == null || req.params.id == "") return res.status(400).send({ status: false })
 
-    const famille = await Famille.findOne({ _id: req.params.id })
+    const fonction = await Fonction.findOne({ _id: req.params.id })
 
-    return res.send({ status: true, resultat: famille })
+    return res.send({ status: true, resultat: fonction })
 
 })
 
 router.get('/getAllParametres', async(req, res) => {
 
-    const familles = await Famille.find({})
+    const fonctions = await Fonction.find({})
 
-    return res.send({ status: true, familles: familles })
+    return res.send({ status: true, fonctions: fonctions })
 })
 
 function verifytoken(req, res, next) {
@@ -201,4 +200,4 @@ function verifytoken(req, res, next) {
 
 }
 
-module.exports.routerFamille = router
+module.exports.routerFonction = router
